@@ -17,7 +17,7 @@ Patch4:		%{name}-uid.patch
 Prereq:		/sbin/chkconfig
 Prereq:		rc-scripts >= 0.2.0
 Prereq:		fileutils
-Requires:	dev >= 2.8.0-3
+Requires:	dev >= 2.8.0-4
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
