@@ -5,8 +5,12 @@ Version:	1.0.2
 Release:	8
 License:	GPL
 Group:		Daemons
-#Source0:	http://www.loran.com/~layes/arpd/%{name}-%{version}.tar.gz  (origin, but 404)
-Source0:	ftp://ftp.slackware.org:/pub/slackware/slackware-4.0/source/n/tcpip1/%{name}-%{version}.tar.gz
+# origin, but 404
+#Source0:	http://www.loran.com/~layes/arpd/%{name}-%{version}.tar.gz
+# working (copy of original package):
+#Source0:	http://www.funet.fi/pub/Linux/PEOPLE/Linus/net-source/base/%{name}-%{version}.tar.gz
+# but in CVS we probably have some renamed source from Debian (with .orig inside)
+Source0:	%{name}-%{version}.tar.gz
 Source1:	%{name}-init
 Patch0:		%{name}-%{version}.debian-patch
 Patch1:		%{name}-%{version}.pld-patch
@@ -14,9 +18,9 @@ Patch2:		%{name}-makefile-patch
 Patch3:		%{name}-more_tables.patch
 Patch4:		%{name}-uid.patch
 #URL:		http://www.loran.com/~layes/arpd/
-Prereq:		/sbin/chkconfig
-Prereq:		rc-scripts >= 0.2.0
 Prereq:		fileutils
+Prereq:		rc-scripts >= 0.2.0
+Requires(post,preun):	/sbin/chkconfig
 Requires:	dev >= 2.8.0-4
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -75,7 +79,6 @@ if [ "$1" = "0" ]; then
 	fi
 	/sbin/chkconfig --del arpd
 fi
-
 
 %files
 %defattr(644,root,root,755)
