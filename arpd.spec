@@ -60,18 +60,10 @@ install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/arpd
 gzip -9nf CHANGES
 
 %pre
-if [ -n "`id -u arpd 2>/dev/null`" ]; then
-	if [ "`id -u arpd`" != "40" ]; then
-		echo "Warning: user arpd haven't uid=40. Correct this before installing arpd." 1>&2
-		exit 1
-	fi
-else
-	echo "Adding arpd user (UID=40)"
-	/usr/sbin/useradd -u 40 -r -d /var/lib/arpd -s /bin/false -c "arpd user" -g daemon arpd 1>&2
-fi
+USER=arpd; UID=40; HOMEDIR=/var/lib/arpd; COMMENT="arpd user"
+GROUP=daemon; %useradd
 
 %post
-/sbin/chkconfig --add arpd
 if [ ! -L /dev/arpd ]; then
 	echo "Moving /dev/arpd to /var/lib/arpd/arpd and making symlink"
 	mv -f /dev/arpd /var/lib/arpd
@@ -79,20 +71,11 @@ if [ ! -L /dev/arpd ]; then
 	ln -s /var/lib/arpd/arpd dev/arpd
 fi
 echo "You need arpd kernel support. The standard kernels of PLD lack this support!!"
-if [ -f /var/lock/subsys/arpd ]; then
-	/etc/rc.d/init.d/arpd restart 1>&2
-else
-	echo "Run \"/etc/rc.d/init.d/arpd start\" to start arpd daemon."
-fi
-
+DESC="arpd daemon"; %chkconfig_post
 
 %preun
-/sbin/chkconfig --del arpd
+%chkconfig_preun
 if [ "$1" = "0" ]; then
-	if [ -f /var/lock/subsys/arpd ]; then
-		/etc/rc.d/init.d/arpd stop 1>&2
-	fi
-	/sbin/chkconfig --del arpd
 	echo "Moving /var/lib/arpd/arpd to /dev/arpd and removing symlink"
 	rm -f /dev/arpd
 	mv -f /var/lib/arpd/arpd /dev/arpd
@@ -100,10 +83,7 @@ if [ "$1" = "0" ]; then
 fi
 
 %postun
-if [ "$1" = "0" ]; then
-	echo "Removing arpd user (UID=40)"
-	/usr/sbin/userdel arpd
-fi
+USER=arpd; %userdel
 
 %clean
 rm -rf $RPM_BUILD_ROOT
