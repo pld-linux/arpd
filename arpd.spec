@@ -7,13 +7,15 @@ License:	GPL
 Group:		Daemons
 Group(de):	Server
 Group(pl):	Serwery
-Source0:	%{name}-%{version}.tar.gz
+#Source0:	http://www.loran.com/~layes/arpd/%{name}-%{version}.tar.gz  (origin, but 404)
+Source0:	ftp://ftp.slackware.org:/pub/slackware/slackware-4.0/source/n/tcpip1/%{name}-%{version}.tar.gz
 Source1:	%{name}-init
 Patch0:		%{name}-%{version}.debian-patch
 Patch1:		%{name}-%{version}.pld-patch
 Patch2:		%{name}-makefile-patch
 Patch3:		%{name}-more_tables.patch
 Patch4:		%{name}-uid.patch
+#URL:		http://www.loran.com/~layes/arpd/
 Prereq:		/sbin/chkconfig
 Prereq:		rc-scripts >= 0.2.0
 Prereq:		fileutils
