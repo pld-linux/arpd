@@ -2,7 +2,7 @@ Summary:	User-space arp daemon
 Summary(pl):	Demon arpd
 Name:		arpd
 Version:	1.0.2
-Release:	7
+Release:	8
 License:	GPL
 Group:		Daemons
 #Source0:	http://www.loran.com/~layes/arpd/%{name}-%{version}.tar.gz  (origin, but 404)
@@ -57,8 +57,6 @@ install -d $RPM_BUILD_ROOT/{usr/sbin,etc/rc.d/init.d}
 install arpd $RPM_BUILD_ROOT%{_sbindir}/arpd
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/arpd
 
-gzip -9nf CHANGES
-
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -81,6 +79,6 @@ fi
 
 %files
 %defattr(644,root,root,755)
-%doc *.gz README.html
+%doc CHANGES README.html
 %attr(754,root,root) %{_sbindir}/arpd
 %attr(754,root,root) /etc/rc.d/init.d/arpd
