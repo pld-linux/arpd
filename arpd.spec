@@ -5,8 +5,6 @@ Version:	1.0.2
 Release:	7
 License:	GPL
 Group:		Daemons
-Group(de):	Server
-Group(pl):	Serwery
 #Source0:	http://www.loran.com/~layes/arpd/%{name}-%{version}.tar.gz  (origin, but 404)
 Source0:	ftp://ftp.slackware.org:/pub/slackware/slackware-4.0/source/n/tcpip1/%{name}-%{version}.tar.gz
 Source1:	%{name}-init
