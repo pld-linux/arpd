@@ -5,7 +5,7 @@
  /* these shouldn't change for ipv4 */
  #define ARPD_TRIEWIDTH	256
 -#define ARPD_TRIEDEPTH	4
-+#define ARPD_TRIEDEPTH	8
++#define ARPD_TRIEDEPTH	16
  
  union arpd_triedef
  {
