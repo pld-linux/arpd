@@ -1,17 +1,51 @@
 --- ./arpd.c.orig	Tue Jul 17 18:46:39 2001
-+++ ./arpd.c	Tue Jul 17 19:24:22 2001
-@@ -74,9 +74,13 @@
++++ ./arpd.c	Fri Jul 27 20:32:06 2001
+@@ -74,11 +74,15 @@
  
  	openlog ("arpd", LOG_PID | LOG_CONS, LOG_DAEMON);
  
 -	syslog(LOG_NOTICE, "Initializing, version %s\n", ARPD_VERSION);
 +	syslog(LOG_NOTICE, "Initializing, PLD-modified version %s\n", ARPD_VERSION);
  
- 	fd = open("/dev/arpd", O_RDWR);
+-	fd = open("/dev/arpd", O_RDWR);
++	fd = open("/var/lib/arpd/arpd", O_RDWR);
 +/* You need to have user UID=40 in your system. There is needed to make checking
 + * that "little" thing. */
 +	setuid(40);
 +	
  	if (fd < 0) {
- 		syslog(LOG_CRIT, "cannot open /dev/arpd: %m");
+-		syslog(LOG_CRIT, "cannot open /dev/arpd: %m");
++		syslog(LOG_CRIT, "cannot open /var/lib/arpd/arpd: %m");
  		exit(-1);
+ 	}
+ 
+@@ -89,12 +93,12 @@
+ 		if (status < 0) {
+ 			if (errno == EINTR)
+ 				continue;
+-			syslog(LOG_CRIT, "cannot read from /dev/arpd: %m");
++			syslog(LOG_CRIT, "cannot read from /var/lib/arpd/arpd: %m");
+ 			exit(-1);
+ 		}
+ 		if (status != sizeof(req))
+ 		{
+-			syslog(LOG_CRIT, "read from /dev/arpd returns %d",
++			syslog(LOG_CRIT, "read from /var/lib/arpd/arpd returns %d",
+ 				 status);
+ 			exit(-1);
+ 		}
+@@ -115,12 +119,12 @@
+ 			status = write(fd, rep, sizeof(*rep));
+ 			if (status < 0) {
+ 				 syslog(LOG_CRIT,
+-					"cannot write to /dev/arpd: %m");
++					"cannot write to /var/lib/arpd/arpd: %m");
+ 				exit(-1);
+ 			}
+ 			if (status != sizeof(*rep)) {
+ 				syslog(LOG_CRIT, 
+-					"write to /dev/arpd returns %d",
++					"write to /var/lib/arpd/arpd returns %d",
+ 					 status);
+ 				exit(-1);
+ 			}
