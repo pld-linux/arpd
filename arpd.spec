@@ -71,10 +71,10 @@ if [ ! -L /dev/arpd ]; then
 	ln -s /var/lib/arpd/arpd dev/arpd
 fi
 echo "You need arpd kernel support. The standard kernels of PLD lack this support!!"
-DESC="arpd daemon"; %chkconfig_post
+DESC="arpd daemon"; %chkconfig_add
 
 %preun
-%chkconfig_preun
+%chkconfig_del
 if [ "$1" = "0" ]; then
 	echo "Moving /var/lib/arpd/arpd to /dev/arpd and removing symlink"
 	rm -f /dev/arpd
