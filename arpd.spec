@@ -65,25 +65,27 @@ if [ -n "`id -u arpd 2>/dev/null`" ]; then
 		exit 1
 	fi
 else
-	echo "Adding arpd user"
+	echo "Adding arpd user (UID=40)"
 	/usr/sbin/useradd -u 40 -r -d /var/lib/arpd -s /bin/false -c "arpd user" -g daemon arpd 1>&2
 fi
 
 %post
 /sbin/chkconfig --add arpd
 if [ ! -e /dev/arpd ]; then
+	echo "Making /dev/arpd device"
 	mknod /dev/arpd c 36 8 
+	echo "Moving /dev/arpd to /var/lib/arpd/arpd and making symlink"
 	mv -f /dev/arpd /var/lib/arpd
 	chown arpd /var/lib/arpd/arpd
 	ln -s /var/lib/arpd/arpd dev/arpd
 else
 	if [ ! -L /dev/arpd ]; then
+		echo "Moving /dev/arpd to /var/lib/arpd/arpd and making symlink"
 		mv -f /dev/arpd /var/lib/arpd
 		chown arpd /var/lib/arpd/arpd
 		ln -s /var/lib/arpd/arpd dev/arpd
 	fi
 fi
-echo "Warning!!"
 echo "You need arpd kernel support. The standard kernels of PLD lack this support!!"
 if [ -f /var/lock/subsys/arpd ]; then
 	/etc/rc.d/init.d/arpd restart 1>&2
@@ -99,6 +101,7 @@ if [ "$1" = "0" ]; then
 		/etc/rc.d/init.d/arpd stop 1>&2
 	fi
 	/sbin/chkconfig --del arpd
+	echo "Moving /var/lib/arpd/arpd to /dev/arpd and removing symlink"
 	rm -f /dev/arpd
 	mv -f /var/lib/arpd/arpd /dev/arpd
 	chown root:root /dev/arpd
@@ -106,6 +109,7 @@ fi
 
 %postun
 if [ "$1" = "0" ]; then
+	echo "Removing arpd user (UID=40)"
 	/usr/sbin/userdel arpd
 fi
 
