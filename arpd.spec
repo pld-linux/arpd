@@ -2,7 +2,7 @@ Summary:	User-space arp daemon
 Summary(pl):	Demon arpd
 Name:		arpd
 Version:	1.0.2
-Release:	9
+Release:	11
 License:	GPL
 Group:		Daemons
 # origin, but 404
