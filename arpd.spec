@@ -11,6 +11,7 @@ Source0:	%{name}-%{version}.tar.gz
 Source1:	%{name}-init
 Patch0:		%{name}-%{version}.debian-patch
 Patch1:		%{name}-%{version}.pld-patch
+Patch2:		%{name}-makefile-patch
 Prereq:		/sbin/chkconfig
 Prereq:		rc-scripts >= 0.2.0
 Prereq:		fileutils
@@ -34,6 +35,7 @@ Nie powinien byæ startowany bez tego!!
 %setup  -q -n %{name}-%{version}.orig
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 
 %build
 
