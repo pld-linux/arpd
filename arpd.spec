@@ -17,7 +17,8 @@ Patch4:		%{name}-uid.patch
 Prereq:		/sbin/chkconfig
 Prereq:		rc-scripts >= 0.2.0
 Prereq:		fileutils
-BuildRequires:	fakeroot
+Requires:	dev >= 2.8.0-3
+#BuildRequires:	fakeroot
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -56,7 +57,7 @@ Ta wersja pracuje na UID=40.
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT/{usr/sbin,etc/rc.d/init.d,/var/lib/arpd}
+install -d $RPM_BUILD_ROOT/{usr/sbin,etc/rc.d/init.d}
 
 install arpd $RPM_BUILD_ROOT%{_sbindir}/arpd
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/arpd
@@ -64,8 +65,8 @@ install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/arpd
 gzip -9nf CHANGES
 
 # making device with fakeroot:
-cd $RPM_BUILD_ROOT/var/lib/arpd
-mknod arpd c 36 8
+#cd $RPM_BUILD_ROOT/var/lib/arpd
+#mknod arpd c 36 8
 
 %pre
 if [ -n "`id -u arpd 2>/dev/null`" ]; then
@@ -75,7 +76,7 @@ if [ -n "`id -u arpd 2>/dev/null`" ]; then
 	fi
 else
 	echo "Adding arpd user (UID=40)"
-	/usr/sbin/useradd -u 40 -r -d /var/lib/arpd -s /bin/false -c "arpd user" -g daemon arpd 1>&2
+	/usr/sbin/useradd -u 40 -r -d /no/home -s /bin/false -c "arpd user" -g daemon arpd 1>&2
 fi
 
 %post
@@ -85,6 +86,7 @@ if [ -f /var/lock/subsys/arpd ]; then
 else
 	echo "Run \"/etc/rc.d/init.d/arpd start\" to start arpd daemon."
 fi
+chown arpd:root /dev/arpd
 
 
 %preun
@@ -110,4 +112,4 @@ rm -rf $RPM_BUILD_ROOT
 %doc *.gz README.html
 %attr(754,root,root) %{_sbindir}/arpd
 %attr(754,root,root) /etc/rc.d/init.d/arpd
-%dir %attr(750,arpd,root) /var/lib/arpd/*
+#%dir %attr(750,arpd,root) /var/lib/arpd/*
