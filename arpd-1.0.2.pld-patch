@@ -1,0 +1,11 @@
+--- ./arpd.c.orig	Sun Mar 18 00:36:18 2001
++++ ./arpd.c	Sun Mar 18 00:35:33 2001
+@@ -58,7 +58,7 @@
+ 	if (fork())
+ 		exit(0);
+ 
+-	for (fd=0; fd < OPEN_MAX; fd++)
++	for (fd=0; fd < FOPEN_MAX; fd++)
+ 		close(fd);
+ 
+ 	fd = open("/dev/null", O_RDWR);

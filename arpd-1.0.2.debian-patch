@@ -1,0 +1,354 @@
+--- arpd-1.0.2.orig/Makefile
++++ arpd-1.0.2/Makefile
+@@ -3,16 +3,19 @@
+ VERSION = 1.0.2
+ KERNELVERSION = linux-2.0.0
+ 
+-# DEBUG = -DDEBUG
+-
+ CC = gcc
+-CFLAGS = -m486 -O6 -pipe -fomit-frame-pointer -Wall \
+-	-DARPD_VERSION=\"$(VERSION)\" $(DEBUG)
++CFLAGS = -m486 -O3 -pipe -fomit-frame-pointer -Wall
++CDEFS  = -DARPD_VERSION=\"$(VERSION)\" -DNDEBUG
+ 
+ all:	arpd
+ 
++arpd:	arpd.o
++
++.c.o:
++	$(CC) $(CPPFLAGS) $(CFLAGS) $(CDEFS) -c $< -o $@
++
+ clean:
+-	rm -f arpd
++	rm -f arpd *.o core
+ 
+ package: clean
+ 	-(cd /usr/src; \
+--- arpd-1.0.2.orig/arpd.c
++++ arpd-1.0.2/arpd.c
+@@ -14,6 +14,9 @@
+ #include <syslog.h>
+ #include <fcntl.h>
+ #include <string.h>
++#include <limits.h>
++#include <sys/types.h>
++#include <errno.h>
+ #include <net/if_arp.h>
+ #include <sys/socket.h>
+ #include <netinet/in.h>
+@@ -41,7 +44,7 @@
+ void arpd_walk_procfs(struct arpd_request *, void *);
+ void arpd_walk_flush(struct arpd_request *, void *);
+ void arpd_walk (void (*fn)(struct arpd_request *, void *), void *);
+-static struct arpd_request * arpd_find (unsigned long, __u32,
++static struct arpd_request * arpd_find (unsigned long, u_int32_t,
+ 						 struct arpd_request *);
+ 
+ int main(int argc, char **argv)
+@@ -147,7 +150,7 @@
+ 
+ /*  if newent == NULL, we are doing a lookup, else its an update */
+ 
+-static struct arpd_request * arpd_find (unsigned long dev, __u32 ip,
++static struct arpd_request * arpd_find (unsigned long dev, u_int32_t ip,
+ 						 struct arpd_request * newent)
+ {
+ 	int depth, i;
+@@ -264,7 +267,7 @@
+         struct in_addr inaddr;
+ 
+ 	inaddr.s_addr = request->ip;
+-	fprintf(stderr, "Tbl: %s (%08lx)\n", 
++	fprintf(stderr, "Tbl: %s (%08x)\n", 
+ 		inet_ntoa(inaddr), ntohl(request->ip));
+ 	return;
+ }
+--- arpd-1.0.2.orig/debian/README.debian
++++ arpd-1.0.2/debian/README.debian
+@@ -0,0 +1,6 @@
++arpd for DEBIAN
++----------------------
++
++So far nothing to say.
++
++Dominik Kubla <kubla@netz.klinik.uni-mainz.de>, Sun, 24 Nov 1996 20:32:09 +0100
+--- arpd-1.0.2.orig/debian/changelog
++++ arpd-1.0.2/debian/changelog
+@@ -0,0 +1,52 @@
++arpd (1.0.2-7) unstable; urgency=high
++
++  * temporary release to use mknod instead of MAKEDEV - fixes #38398
++
++ -- Elie Rosenblum <fnord@debian.org>  Thu, 27 May 1999 16:27:55 -0500
++
++arpd (1.0.2-6) frozen; urgency=low
++
++  * brought up to new standards compliance 
++
++ -- Elie Rosenblum <fnord@debian.org>  Sun, 15 Mar 1998 13:08:42 -0500
++
++arpd (1.0.2-5) unstable; urgency=low
++
++  * Fixed FSF address in copyright file. 
++  * Linked 'undocumented' manpage. Fixes bug without a tracking # yet
++  * added force-reload / force-restart methods to init.d script 
++  * Fixed Bug#19269 (md5sums)
++
++ -- Elie Rosenblum <fnord@debian.org>  Sat, 14 Mar 1998 10:43:45 -0500
++
++arpd (1.0.2-4) unstable; urgency=low
++
++  * Fixed policy in postinst by getting arpd added to makedev
++  * Changed init.d script to comply with policy
++
++ -- Elie Rosenblum <fnord@debian.org>  Tue, 13 Jan 1998 18:17:38 -0500
++
++arpd (1.0.2-3) unstable; urgency=low
++
++  * Fixed init.d script
++  * Brought up to libc6 
++  * Changed postinst script to comply with policy 
++
++ -- Elie Rosenblum <fnord@debian.org>  Tue, 16 Dec 1997 12:10:36 -0500
++
++arpd (1.0.2-2) experimental; urgency=low
++
++  * Created postinst script.
++  * Public release.
++
++ -- Dominik Kubla <dominik@debian.org>  Tue,  4 Feb 1997 17:44:03 +0100
++
++arpd (1.0.2-1) experimental; urgency=low
++
++  * Internal Release.
++
++ -- Dominik Kubla <kubla@Uni-Mainz.DE>  Sun, 24 Nov 1996 20:32:09 +0100
++
++Local variables:
++mode: debian-changelog
++End:
+--- arpd-1.0.2.orig/debian/init.d
++++ arpd-1.0.2/debian/init.d
+@@ -0,0 +1,61 @@
++#!/bin/sh
++#
++# This file was automatically customized by debmake on Sun, 24 Nov 1996 20:32:09 +0100
++#
++# Written by Miquel van Smoorenburg <miquels@drinkel.ow.org>.
++# Modified for Debian GNU/Linux by Ian Murdock <imurdock@gnu.ai.mit.edu>.
++# Modified for Debian by Christoph Lameter <clameter@debian.org>
++
++PATH=/bin:/usr/bin:/sbin:/usr/sbin
++DAEMON=/usr/sbin/arpd
++# The following value is extracted by debstd to figure out how to generate
++# the postinst script. Edit the field to change the way the script is
++# registered through update-rc.d (see the manpage for update-rc.d!)
++FLAGS="defaults 20"
++
++test -f $DAEMON || exit 0
++
++usage () {
++  echo "Usage: $0 {start|stop|reload|force-reload|force-restart}" 1>&2
++  exit 1
++}
++
++dorun () {
++  case "$1" in
++    start)
++      if [ -c /dev/arpd ]; then
++        echo -n "Starting user-space ARP daemon: arpd"
++        start-stop-daemon --start --verbose --quiet --exec $DAEMON
++        echo "."
++      else
++         echo "Not starting ARP daemon without /dev/arpd."
++      fi
++      ;;
++    stop)
++      echo -n "Stopping user-space ARP daemon: arpd"
++      start-stop-daemon --quiet --stop --verbose --exec $DAEMON
++      echo "."
++      ;;
++    restart)
++      dorun force-restart
++      ;;
++    force-reload)
++      dorun force-restart
++      ;;
++    force-restart)
++      dorun stop
++      dorun start
++      ;;
++    *)
++      usage
++      ;;
++  esac
++}
++
++if [ "$#" -eq "1" ]; then
++  dorun "$1"
++else
++  usage
++fi
++
++exit 0
+--- arpd-1.0.2.orig/debian/control
++++ arpd-1.0.2/debian/control
+@@ -0,0 +1,16 @@
++Source: arpd
++Section: net
++Priority: extra
++Maintainer: Elie Rosenblum <fnord@debian.org>
++Standards-Version: 2.4.0.0
++
++Package: arpd
++Architecture: any
++Depends: ${shlibs:Depends}, makedev (>=1.6-29)
++Description: A user-space ARP daemon
++ The ARP daemon moves the management of the ARP (Address Resolution
++ Protocol) table from kernel to user space.  It is useful for sites
++ with LARGE network segments (256+ systems per segment), because the
++ kernel hash tables are not optimized to handle this situation. To use
++ the ARP daemon your kernel needs to have ARPD and NETLINK support
++ enabled. The standard kernels of Debian GNU/Linux lack this support.
+--- arpd-1.0.2.orig/debian/copyright
++++ arpd-1.0.2/debian/copyright
+@@ -0,0 +1,30 @@
++This package was debianized by Dominik Kubla kubla@netz.klinik.uni-mainz.de on
++Sun, 24 Nov 1996 20:32:09 +0100.
++
++It was downloaded from http://www.loran.com/~layes/arpd/arpd-1.0.2.tar.gz
++
++Copyright:
++
++(So as not to confuse RMS or anyone else, arpd is not a derivative nor 
++is it a part of the GNU project.  I include the GPL here only because it
++mostly applies and I'm too lazy to write my own legalese.  Although you
++will see 'gcc' in the Makefile, feel free to use any compiler you wish
++if it makes you happy.)
++		    		    
++This program is free software; you can redistribute it and/or modify it
++under the terms of the GNU General Public License as published by the
++Free Software Foundation; either version 2, or (at your option) any
++later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, 59 Temple Place - Suite 330,
++Boston, MA 02111-1307, USA.
++
++On Debian GNU/Linux systems, the complete text of the GNU General
++Public License can be found in `/usr/doc/copyright/GPL'.
+--- arpd-1.0.2.orig/debian/rules
++++ arpd-1.0.2/debian/rules
+@@ -0,0 +1,60 @@
++#!/usr/bin/make -f
++# Sample debian.rules file - for GNU Hello (1.3).
++# Copyright 1994,1995 by Ian Jackson.
++# I hereby give you perpetual unlimited permission to copy,
++# modify and relicense this file, provided that you do not remove
++# my name from the file itself.  (I assert my moral right of
++# paternity under the Copyright, Designs and Patents Act 1988.)
++# This file may have to be extensively modified
++#
++# Modified to be a prototype for debmake by Christoph Lameter <clameter@debian.org>
++
++package=arpd
++
++build:
++	$(checkdir)
++	make CFLAGS="-g -O2 -Wall"
++	touch build
++
++clean:
++	$(checkdir)
++	-rm -f build
++	-make clean
++	-rm `find . -name "*~"`
++	-rm -rf debian/tmp debian/files* core
++
++binary-indep:	checkroot build
++	$(checkdir)
++# There are no architecture-independent files to be uploaded
++# generated by this package.  If there were any they would be
++# made here.
++
++binary-arch:	checkroot build
++	$(checkdir)
++	-rm -rf debian/tmp
++	install -d debian/tmp/usr/sbin
++	install -s -m 0755 arpd debian/tmp/usr/sbin
++	install -d debian/tmp/usr/man/man8
++	ln -s ../man7/undocumented.7.gz debian/tmp/usr/man/man8/arpd.8.gz
++	debstd CHANGES README*
++	dpkg-gencontrol
++	chown -R root.root debian/tmp
++	chmod -R go=rX debian/tmp
++	dpkg --build debian/tmp ..
++
++define checkdir
++	test -f debian/rules
++endef
++
++# Below here is fairly generic really
++
++binary:		binary-indep binary-arch
++
++source diff:
++	@echo >&2 'source and diff are obsolete - use dpkg-source -b'; false
++
++checkroot:
++	$(checkdir)
++	test root = "`whoami`"
++
++.PHONY: binary binary-arch binary-indep clean checkroot
+--- arpd-1.0.2.orig/debian/postinst
++++ arpd-1.0.2/debian/postinst
+@@ -0,0 +1,34 @@
++#!/bin/sh
++
++makedevice() {
++# arpd device added as of makedev 1.6-29
++# arpd no longer in makedev
++	rm -f /dev/arpd
++	mknod /dev/arpd c 36 8 || true
++	#(
++		#cd /dev
++		#./MAKEDEV -vc arpd
++	#)
++}
++
++if [ ! -c /dev/arpd ]
++then
++	cat<<__EOF
++
++To run arpd, you _must_ have the /dev/arpd character device with major
++number 36 and minor 8. Your system does not have this device. If you say
++no here, you will have to create the device by hand with MAKEDEV arpd.
++
++__EOF
++        echo -n "May I create /dev/arpd for you? [yn] "
++        read answer
++	echo
++        case "x$answer" in
++		x|xy|xY|xyes|xYes|xYES)
++			makedevice
++			;;
++		*)
++			echo "Very well, not creating /dev/arpd."
++			;;
++	esac
++fi
+--- arpd-1.0.2.orig/debian/conffiles
++++ arpd-1.0.2/debian/conffiles
+@@ -0,0 +1 @@
++/etc/init.d/arpd
+--- arpd-1.0.2.orig/debian/substvars
++++ arpd-1.0.2/debian/substvars
+@@ -0,0 +1 @@
++shlibs:Depends=libc6
