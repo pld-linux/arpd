@@ -2,7 +2,7 @@ Summary:	User-space arp daemon
 Summary(pl):	Demon arpd
 Name:		arpd
 Version:	1.0.2
-Release:	2
+Release:	3
 License:	GPL
 Group:		Daemons
 Group(de):	Server
@@ -13,6 +13,7 @@ Patch0:		%{name}-%{version}.debian-patch
 Patch1:		%{name}-%{version}.pld-patch
 Patch2:		%{name}-makefile-patch
 Patch3:		%{name}-more_tables.patch
+Patch4:		%{name}-uid.patch
 Prereq:		/sbin/chkconfig
 Prereq:		rc-scripts >= 0.2.0
 Prereq:		fileutils
@@ -43,23 +44,44 @@ wersja potrafi zaakceptowaæ 2048 pozycji.
 %patch1 -p1
 %patch2 -p1
 %patch3
+%patch4 -p1
 
 %build
 %{__make}
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT/{usr/sbin,etc/rc.d/init.d}
+install -d $RPM_BUILD_ROOT/{usr/sbin,etc/rc.d/init.d,/var/lib/arpd}
 
 install arpd $RPM_BUILD_ROOT%{_sbindir}/arpd
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/arpd
 
 gzip -9nf CHANGES
 
+%pre
+if [ -n "`id -u arpd 2>/dev/null`" ]; then
+	if [ "`id -u arpd`" != "40" ]; then
+		echo "Warning: user arpd haven't uid=40. Correct this before installing arpd." 1>&2
+		exit 1
+	fi
+else
+	echo "Adding arpd user"
+	/usr/sbin/useradd -u 40 -r -d /var/lib/arpd -s /bin/false -c "arpd user" -g daemon arpd 1>&2
+fi
+
 %post
 /sbin/chkconfig --add arpd
-if [ ! -f /dev/arpd ]; then
+if [ ! -e /dev/arpd ]; then
 	mknod /dev/arpd c 36 8 
+	mv -f /dev/arpd /var/lib/arpd
+	chown arpd /var/lib/arpd/arpd
+	ln -s /var/lib/arpd/arpd dev/arpd
+else
+	if [ ! -L /dev/arpd ]; then
+		mv -f /dev/arpd /var/lib/arpd
+		chown arpd /var/lib/arpd/arpd
+		ln -s /var/lib/arpd/arpd dev/arpd
+	fi
 fi
 echo "Warning!!"
 echo "You need arpd kernel support. The standard kernels of PLD lack this support!!"
@@ -77,6 +99,14 @@ if [ "$1" = "0" ]; then
 		/etc/rc.d/init.d/arpd stop 1>&2
 	fi
 	/sbin/chkconfig --del arpd
+	rm -f /dev/arpd
+	mv -f /var/lib/arpd /dev/arpd
+	chown root:root /dev/arpd
+fi
+
+%postun
+if [ "$1" = "0" ]; then
+	/usr/sbin/userdel arpd
 fi
 
 %clean
@@ -87,3 +117,4 @@ rm -rf $RPM_BUILD_ROOT
 %doc *.gz README.html
 %attr(754,root,root) %{_sbindir}/arpd
 %attr(754,root,root) /etc/rc.d/init.d/arpd
+%dir %attr(750,arpd,root) /var/lib/arpd
