@@ -1,0 +1,12 @@
+diff -Naur arpd-1.0.2.orig/Makefile arpd-p/Makefile
+--- arpd-1.0.2.orig/Makefile	Sun Mar 18 15:42:31 2001
++++ arpd-p/Makefile	Sun Mar 18 15:44:40 2001
+@@ -4,7 +4,7 @@
+ KERNELVERSION = linux-2.0.0
+ 
+ CC = gcc
+-CFLAGS = -m486 -O3 -pipe -fomit-frame-pointer -Wall
++CFLAGS = $(RPM_OPT_FLAGS) -Wall
+ CDEFS  = -DARPD_VERSION=\"$(VERSION)\" -DNDEBUG
+ 
+ all:	arpd
