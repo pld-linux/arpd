@@ -2,7 +2,7 @@ Summary:	User-space arp daemon
 Summary(pl):	Demon arpd
 Name:		arpd
 Version:	1.0.2
-Release:	5
+Release:	6
 License:	GPL
 Group:		Daemons
 Group(de):	Server
@@ -18,7 +18,6 @@ Prereq:		/sbin/chkconfig
 Prereq:		rc-scripts >= 0.2.0
 Prereq:		fileutils
 Requires:	dev >= 2.8.0-3
-#BuildRequires:	fakeroot
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -30,7 +29,6 @@ daemon your kernel needs to have ARPD and NETLINK support enabled. The
 standard kernels of PLD lack this support. It shouldn't be run without
 that!! This version can alocate 2048 entries.
 
-This is version which runs at UID=40.
 
 %description -l pl
 Demon ARP przekazuje zarz±dzanie tablic± ARP (Address Resolution
@@ -42,7 +40,6 @@ support uaktywnione w j±drze. Uwaga! Stanadardowe j±dro PLD nie ma
 supportu ARPD!!. Demon nie powinien byæ startowany bez tego!! Ta
 wersja potrafi zaakceptowaæ 2048 pozycji.
 
-Ta wersja pracuje na UID=40.
 
 %prep
 %setup  -q -n %{name}-%{version}.orig
@@ -64,20 +61,6 @@ install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/arpd
 
 gzip -9nf CHANGES
 
-# making device with fakeroot:
-#cd $RPM_BUILD_ROOT/var/lib/arpd
-#mknod arpd c 36 8
-
-%pre
-if [ -n "`id -u arpd 2>/dev/null`" ]; then
-	if [ "`id -u arpd`" != "40" ]; then
-		echo "Warning: user arpd haven't uid=40. Correct this before installing arpd." 1>&2
-		exit 1
-	fi
-else
-	echo "Adding arpd user (UID=40)"
-	/usr/sbin/useradd -u 40 -r -d /no/home -s /bin/false -c "arpd user" -g daemon arpd 1>&2
-fi
 
 %post
 /sbin/chkconfig --add arpd
@@ -86,8 +69,6 @@ if [ -f /var/lock/subsys/arpd ]; then
 else
 	echo "Run \"/etc/rc.d/init.d/arpd start\" to start arpd daemon."
 fi
-chown arpd:root /dev/arpd
-
 
 %preun
 /sbin/chkconfig --del arpd
@@ -98,11 +79,6 @@ if [ "$1" = "0" ]; then
 	/sbin/chkconfig --del arpd
 fi
 
-%postun
-if [ "$1" = "0" ]; then
-	echo "Removing arpd user (UID=40)"
-	/usr/sbin/userdel arpd
-fi
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -112,4 +88,3 @@ rm -rf $RPM_BUILD_ROOT
 %doc *.gz README.html
 %attr(754,root,root) %{_sbindir}/arpd
 %attr(754,root,root) /etc/rc.d/init.d/arpd
-#%dir %attr(750,arpd,root) /var/lib/arpd/*
