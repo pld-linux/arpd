@@ -2,7 +2,7 @@ Summary:	User-space arp daemon
 Summary(pl):	Demon arpd
 Name:		arpd
 Version:	1.0.2
-Release:	3
+Release:	4
 License:	GPL
 Group:		Daemons
 Group(de):	Server
@@ -17,6 +17,7 @@ Patch4:		%{name}-uid.patch
 Prereq:		/sbin/chkconfig
 Prereq:		rc-scripts >= 0.2.0
 Prereq:		fileutils
+Requires:	dev >= 2.8.0-3
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -71,20 +72,11 @@ fi
 
 %post
 /sbin/chkconfig --add arpd
-if [ ! -e /dev/arpd ]; then
-	echo "Making /dev/arpd device"
-	mknod /dev/arpd c 36 8 
+if [ ! -L /dev/arpd ]; then
 	echo "Moving /dev/arpd to /var/lib/arpd/arpd and making symlink"
 	mv -f /dev/arpd /var/lib/arpd
 	chown arpd /var/lib/arpd/arpd
 	ln -s /var/lib/arpd/arpd dev/arpd
-else
-	if [ ! -L /dev/arpd ]; then
-		echo "Moving /dev/arpd to /var/lib/arpd/arpd and making symlink"
-		mv -f /dev/arpd /var/lib/arpd
-		chown arpd /var/lib/arpd/arpd
-		ln -s /var/lib/arpd/arpd dev/arpd
-	fi
 fi
 echo "You need arpd kernel support. The standard kernels of PLD lack this support!!"
 if [ -f /var/lock/subsys/arpd ]; then
