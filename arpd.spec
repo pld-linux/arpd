@@ -45,15 +45,18 @@ supportu ARPD. Demon nie powinien byæ startowany bez tego! Ta wersja
 potrafi zaakceptowaæ 4096 pozycji.
 
 %prep
-%setup  -q -n %{name}-%{version}.orig
+%setup -q -n %{name}-%{version}.orig
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
-%patch3
+%patch3 -p0
 %patch4 -p1
 
 %build
-%{__make}
+%{__make} \
+	CC="%{__cc}" \
+	LDFLAGS="%{rpmldflags}" \
+	RPM_OPT_FLAGS="%{rpmcflags}"
 
 %install
 rm -rf $RPM_BUILD_ROOT
