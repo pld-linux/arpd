@@ -2,7 +2,7 @@ Summary:	User-space arp daemon
 Summary(pl):	Demon arpd
 Name:		arpd
 Version:	1.0.2
-Release:	1
+Release:	2
 License:	GPL
 Group:		Daemons
 Group(de):	Server
@@ -12,10 +12,10 @@ Source1:	%{name}-init
 Patch0:		%{name}-%{version}.debian-patch
 Patch1:		%{name}-%{version}.pld-patch
 Patch2:		%{name}-makefile-patch
+Patch3:		%{name}-more_tables.patch
 Prereq:		/sbin/chkconfig
 Prereq:		rc-scripts >= 0.2.0
 Prereq:		fileutils
-#BuildRequires:	
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -25,7 +25,7 @@ LARGE network segments (256+ systems per segment), because the kernel
 hash tables are not optimized to handle this situation. To use the ARP
 daemon your kernel needs to have ARPD and NETLINK support enabled. The
 standard kernels of PLD lack this support. It shouldn't be run without
-that!!
+that!! This version can alocate 2048 entries.
 
 %description -l pl
 Demon ARP przekazuje zarz±dzanie tablic± ARP (Address Resolution
@@ -34,13 +34,15 @@ u¿yteczne dla miejsc o du¿ych segmentach sieci (256+ systemów na
 segment), poniewa¿ tablice w j±drze nie s± zoptymalizowane na takie
 sytuacje. Aby u¿ywaæ tego demona musisz mieæ ARPD support oraz NETLINK
 support uaktywnione w j±drze. Uwaga! Stanadardowe j±dro PLD nie ma
-supportu ARPD!!. Demon nie powinien byæ startowany bez tego!!
+supportu ARPD!!. Demon nie powinien byæ startowany bez tego!! Ta
+wersja potrafi zaakceptowaæ 2048 pozycji.
 
 %prep
 %setup  -q -n %{name}-%{version}.orig
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3
 
 %build
 %{__make}

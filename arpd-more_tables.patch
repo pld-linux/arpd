@@ -1,0 +1,11 @@
+--- ./arpd.c.orig	Wed Jun  6 17:04:57 2001
++++ ./arpd.c	Wed Jun  6 17:05:58 2001
+@@ -30,7 +30,7 @@
+ 
+ /* these shouldn't change for ipv4 */
+ #define ARPD_TRIEWIDTH	256
+-#define ARPD_TRIEDEPTH	4
++#define ARPD_TRIEDEPTH	8
+ 
+ union arpd_triedef
+ {
