@@ -19,13 +19,13 @@
  
 +/* usage string				*/
 +static char* usage=
-+"ARP daemon - version 1.0.2 - PLD modified
-+Usage:	arpd -u user
-+-u		user, which you want to run this deamon
-+
-+The user you will take must have RW access to /dev/arpd.
-+If you don't know what to choice take root.
-+
++"ARP daemon - version 1.0.2 - PLD modified\n\
++Usage:	arpd -u user\n\
++-u		user, which you want to run this deamon\n\
++\n\
++The user you will take must have RW access to /dev/arpd.\n\
++If you don't know what to choice take root.\n\
++\n\
 +";
 +
 +void show_usage() {
