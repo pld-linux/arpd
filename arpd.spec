@@ -2,7 +2,7 @@ Summary:	User-space arp daemon
 Summary(pl):	Demon arpd
 Name:		arpd
 Version:	1.0.2
-Release:	4
+Release:	5
 License:	GPL
 Group:		Daemons
 Group(de):	Server
@@ -17,7 +17,7 @@ Patch4:		%{name}-uid.patch
 Prereq:		/sbin/chkconfig
 Prereq:		rc-scripts >= 0.2.0
 Prereq:		fileutils
-Requires:	dev >= 2.8.0-3
+BuildRequires:	fakeroot
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -29,6 +29,8 @@ daemon your kernel needs to have ARPD and NETLINK support enabled. The
 standard kernels of PLD lack this support. It shouldn't be run without
 that!! This version can alocate 2048 entries.
 
+This is version which runs at UID=40.
+
 %description -l pl
 Demon ARP przekazuje zarz±dzanie tablic± ARP (Address Resolution
 Protocol) z kernel'a do przestrzeni u¿ytkownika. Jest to bardzo
@@ -38,6 +40,8 @@ sytuacje. Aby u¿ywaæ tego demona musisz mieæ ARPD support oraz NETLINK
 support uaktywnione w j±drze. Uwaga! Stanadardowe j±dro PLD nie ma
 supportu ARPD!!. Demon nie powinien byæ startowany bez tego!! Ta
 wersja potrafi zaakceptowaæ 2048 pozycji.
+
+Ta wersja pracuje na UID=40.
 
 %prep
 %setup  -q -n %{name}-%{version}.orig
@@ -59,6 +63,10 @@ install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/arpd
 
 gzip -9nf CHANGES
 
+# making device with fakeroot:
+cd $RPM_BUILD_ROOT/var/lib/arpd
+mknod arpd c 36 8
+
 %pre
 if [ -n "`id -u arpd 2>/dev/null`" ]; then
 	if [ "`id -u arpd`" != "40" ]; then
@@ -72,13 +80,6 @@ fi
 
 %post
 /sbin/chkconfig --add arpd
-if [ ! -L /dev/arpd ]; then
-	echo "Moving /dev/arpd to /var/lib/arpd/arpd and making symlink"
-	mv -f /dev/arpd /var/lib/arpd
-	chown arpd /var/lib/arpd/arpd
-	ln -s /var/lib/arpd/arpd dev/arpd
-fi
-echo "You need arpd kernel support. The standard kernels of PLD lack this support!!"
 if [ -f /var/lock/subsys/arpd ]; then
 	/etc/rc.d/init.d/arpd restart 1>&2
 else
@@ -93,10 +94,6 @@ if [ "$1" = "0" ]; then
 		/etc/rc.d/init.d/arpd stop 1>&2
 	fi
 	/sbin/chkconfig --del arpd
-	echo "Moving /var/lib/arpd/arpd to /dev/arpd and removing symlink"
-	rm -f /dev/arpd
-	mv -f /var/lib/arpd/arpd /dev/arpd
-	chown root:root /dev/arpd
 fi
 
 %postun
@@ -113,4 +110,4 @@ rm -rf $RPM_BUILD_ROOT
 %doc *.gz README.html
 %attr(754,root,root) %{_sbindir}/arpd
 %attr(754,root,root) /etc/rc.d/init.d/arpd
-%dir %attr(750,arpd,root) /var/lib/arpd
+%dir %attr(750,arpd,root) /var/lib/arpd/*
