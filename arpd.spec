@@ -4,9 +4,9 @@ Name:		arpd
 Version:	1.0.2
 Release:	1
 License:	GPL
-Group:		Applications/Networking
-Group(pl):	Aplikacje/Sieciowe
-Group(de):	Applikationen/Netzwerkwesen
+Group:		Daemons
+Group(pl):	Serwery
+Group(de):	Server
 Source0:	%{name}-%{version}.tar.gz
 Source1:	%{name}-init
 Patch0:		%{name}-%{version}.debian-patch
@@ -19,17 +19,23 @@ Prereq:		fileutils
 BuildRoot:	%{tmpdir}/%{name}-%{version}.orig
 
 %description
-User-space arp daemon.
-It requires kernel arpd support which isn't supported by standard 
-PLD kernel. It shouldn't be run without that!!
+The ARP daemon moves the management of the ARP (Address Resolution
+Protocol) table from kernel to user space.  It is useful for sites
+with LARGE network segments (256+ systems per segment), because the
+kernel hash tables are not optimized to handle this situation. To use
+the ARP daemon your kernel needs to have ARPD and NETLINK support
+enabled. The standard kernels of PLD lack this support.
+It shouldn't be run without that!!
 
 %description -l pl
-Demon arpd.
-Standardowe j±dro ma organiczon± wielko¶æ tablicy arp do 255. Ten demon
-likwiduje t± niedogodno¶æ wystêpuj±c± w du¿ych sieciach
-
-Uwaga: wymaga arpd support, którego nie ma w standardowym j±drze PLD!!
-Nie powinien byæ startowany bez tego!!
+Demon ARP przekazuje zarz±dzanie tablic± ARP (Address Resolution
+Protocol) z kernel'a do przestrzeni u¿ytkownika. Jest to bardzo 
+u¿yteczne dla miejsc o du¿ych segmentach sieci (256+ systemów na
+segment), poniewa¿ tablice w j±drze nie s± zoptymalizowane na takie
+sytuacje. Aby u¿ywaæ tego demona musisz mieæ ARPD support oraz
+NETLINK support uaktywnione w j±drze. 
+Uwaga! Stanadardowe j±dro PLD nie ma supportu ARPD!!.
+Demon nie powinien byæ startowany bez tego!!
 
 %prep
 %setup  -q -n %{name}-%{version}.orig
@@ -56,7 +62,7 @@ if [ ! -f /dev/arpd ]; then
 	mknod /dev/arpd c 36 8 
 fi
 echo "Warning!!"
-echo "You need arpd kernel support which isn't provided by standard PLD-kernel!!"
+echo "You need arpd kernel support. The standard kernels of PLD lack this support!!"
 if [ -f /var/lock/subsys/arpd ]; then
 	/etc/rc.d/init.d/arpd restart 1>&2
 else
