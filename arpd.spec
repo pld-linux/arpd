@@ -100,7 +100,7 @@ if [ "$1" = "0" ]; then
 	fi
 	/sbin/chkconfig --del arpd
 	rm -f /dev/arpd
-	mv -f /var/lib/arpd /dev/arpd
+	mv -f /var/lib/arpd/arpd /dev/arpd
 	chown root:root /dev/arpd
 fi
 
