@@ -11,6 +11,7 @@ Group:		Daemons
 #Source0:	http://www.funet.fi/pub/Linux/PEOPLE/Linus/net-source/base/%{name}-%{version}.tar.gz
 # but in CVS we probably have some renamed source from Debian (with .orig inside)
 Source0:	%{name}-%{version}.tar.gz
+# Source0-md5:	4b445f5698342c873068a86a18bc3d6a
 Source1:	%{name}-init
 Patch0:		%{name}-%{version}.debian-patch
 Patch1:		%{name}-%{version}.pld-patch
