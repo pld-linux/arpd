@@ -1,0 +1,17 @@
+--- ./arpd.c.orig	Tue Jul 17 18:46:39 2001
++++ ./arpd.c	Tue Jul 17 19:24:22 2001
+@@ -74,9 +74,13 @@
+ 
+ 	openlog ("arpd", LOG_PID | LOG_CONS, LOG_DAEMON);
+ 
+-	syslog(LOG_NOTICE, "Initializing, version %s\n", ARPD_VERSION);
++	syslog(LOG_NOTICE, "Initializing, PLD-modified version %s\n", ARPD_VERSION);
+ 
+ 	fd = open("/dev/arpd", O_RDWR);
++/* You need to have user UID=40 in your system. There is needed to make checking
++ * that "little" thing. */
++	setuid(40);
++	
+ 	if (fd < 0) {
+ 		syslog(LOG_CRIT, "cannot open /dev/arpd: %m");
+ 		exit(-1);
