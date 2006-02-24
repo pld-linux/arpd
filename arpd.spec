@@ -19,10 +19,11 @@ Patch2:		%{name}-makefile-patch
 Patch3:		%{name}-more_tables.patch
 Patch4:		%{name}-uid.patch
 #URL:		http://www.loran.com/~layes/arpd/
-Prereq:		fileutils
-Prereq:		rc-scripts >= 0.2.0
+BuildRequires:	rpmbuild(macros) >= 1.268
 Requires(post,preun):	/sbin/chkconfig
 Requires:	dev >= 2.8.0-4
+Requires:	fileutils
+Requires:	rc-scripts >= 0.2.0
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -70,17 +71,11 @@ rm -rf $RPM_BUILD_ROOT
 
 %post
 /sbin/chkconfig --add arpd
-if [ -f /var/lock/subsys/arpd ]; then
-	/etc/rc.d/init.d/arpd restart 1>&2
-else
-	echo "Run \"/etc/rc.d/init.d/arpd start\" to start arpd daemon."
-fi
+%service arpd restart "arpd daemon"
 
 %preun
 if [ "$1" = "0" ]; then
-	if [ -f /var/lock/subsys/arpd ]; then
-		/etc/rc.d/init.d/arpd stop 1>&2
-	fi
+	%service aprd stop
 	/sbin/chkconfig --del arpd
 fi
 
