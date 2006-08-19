@@ -41,7 +41,7 @@ Protocol) z kernel'a do przestrzeni u¿ytkownika. Jest to bardzo
 u¿yteczne dla miejsc o du¿ych segmentach sieci (256+ systemów na
 segment), poniewa¿ tablice w j±drze nie s± zoptymalizowane na takie
 sytuacje. Aby u¿ywaæ tego demona musisz mieæ ARPD support oraz NETLINK
-support uaktywnione w j±drze. Uwaga! Stanadardowe j±dro PLD nie ma
+support uaktywnione w j±drze. Uwaga! Standardowe j±dro PLD nie ma
 supportu ARPD. Demon nie powinien byæ startowany bez tego! Ta wersja
 potrafi zaakceptowaæ 4096 pozycji.
 
