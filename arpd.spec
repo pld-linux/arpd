@@ -1,5 +1,5 @@
 Summary:	User-space arp daemon
-Summary(pl.UTF-8):   Demon arpd
+Summary(pl.UTF-8):	Demon arpd
 Name:		arpd
 Version:	1.0.2
 Release:	12
