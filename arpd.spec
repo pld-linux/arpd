@@ -1,3 +1,4 @@
+### OBSOLETE ###
 Summary:	User-space arp daemon
 Summary(pl.UTF-8):	Demon arpd
 Name:		arpd
