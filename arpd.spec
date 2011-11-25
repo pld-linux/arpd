@@ -1,6 +1,6 @@
-### OBSOLETE ###
+# OBSOLETE - by what?
 Summary:	User-space arp daemon
-Summary(pl.UTF-8):	Demon arpd
+Summary(pl.UTF-8):	Demon arpd działający w przestrzeni użytkownika
 Name:		arpd
 Version:	1.0.2
 Release:	12
@@ -34,17 +34,17 @@ LARGE network segments (256+ systems per segment), because the kernel
 hash tables are not optimized to handle this situation. To use the ARP
 daemon your kernel needs to have ARPD and NETLINK support enabled. The
 standard kernels of PLD lack this support. It shouldn't be run without
-that! This version can alocate 4096 entries.
+that! This version can allocate 4096 entries.
 
 %description -l pl.UTF-8
 Demon ARP przekazuje zarządzanie tablicą ARP (Address Resolution
-Protocol) z kernel'a do przestrzeni użytkownika. Jest to bardzo
-użyteczne dla miejsc o dużych segmentach sieci (256+ systemów na
-segment), ponieważ tablice w jądrze nie są zoptymalizowane na takie
-sytuacje. Aby używać tego demona musisz mieć ARPD support oraz NETLINK
-support uaktywnione w jądrze. Uwaga! Standardowe jądro PLD nie ma
-supportu ARPD. Demon nie powinien być startowany bez tego! Ta wersja
-potrafi zaakceptować 4096 pozycji.
+Protocol) z jądra do przestrzeni użytkownika. Jest to bardzo użyteczne
+w miejscach o dużych segmentach sieci (256+ systemów na segment),
+ponieważ tablice w jądrze nie są zoptymalizowane na takie sytuacje.
+Aby używać tego demona jądro musi mieć włączoną obsługę ARPD i
+NETLINK. Uwaga! Standardowe jądro PLD nie ma obsługi ARPD. Demon nie
+powinien być startowany bez tego! Ta wersja potrafi przydzielić 4096
+pozycji.
 
 %prep
 %setup -q -n %{name}-%{version}.orig
